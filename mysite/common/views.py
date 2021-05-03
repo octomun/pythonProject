@@ -1,8 +1,13 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
-from common.forms import UserForm
+
+from .forms import UserForm
+
 
 def signup(request):
+    """
+    계정생성
+    """
     if request.method == "POST":
         form = UserForm(request.POST)
         if form.is_valid():
@@ -15,5 +20,3 @@ def signup(request):
     else:
         form = UserForm()
     return render(request, 'common/signup.html', {'form': form})
-
-# Create your views here.
