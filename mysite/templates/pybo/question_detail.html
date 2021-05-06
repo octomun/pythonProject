@@ -82,7 +82,21 @@
             <a href="#" data-uri="{% url 'pybo:vote_answer' answer.id  %}"
                 class="recommend btn btn-sm btn-secondary btn-block my-1">추천</a>
         </div>
-        <div class="col-11">  <!-- 답변영역 -->
+
+        <div class="col-2"> <!-- 댓글 정렬 선택-->
+            <select class="form-control so_comment">
+                <option value="recent" {% if so_answer == 'recent' %}selected{% endif %}>최신순</option>
+                <option value="recommend" {% if so_answer == 'recommend' %}selected{% endif %}>추천순</option>
+                <option value="popular" {% if so_answer == 'popular' %}selected{% endif %}>인기순</option>
+            </select>
+        </div>
+
+        <!-- 댓글 전송 폼-->
+        <form id="searchForm_answer" method="get" action="{% url 'detail' %}">
+            <input type="hidden" id="so_answer" name="so_answer" value="{{ so_answer }}">
+        </form>
+
+        <div class="col-11">  <!-- 추천이 가장 많은 댓글 -->
             <div class="card">
                 <div class="card-body">
                     <div class="card-text">{{ answer.content|mark }}</div>
@@ -134,6 +148,63 @@
                 </div>
             </div>
         </div>
+
+
+
+        <!-- 수정 시작
+        #답변영역
+        <div class="col-11"> 
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-text">{{ answer.content|mark }}</div>
+                    <div class="d-flex justify-content-end">
+                        {% if answer.modify_date %}
+                        <div class="badge badge-light p-2 text-left mx-3">
+                            <div class="mb-2">modified at</div>
+                            <div>{{ answer.modify_date }}</div>
+                        </div>
+                        {% endif %}
+                        <div class="badge badge-light p-2 text-left">
+                            <div class="mb-2">{{ answer.author.username }}</div>
+                            <div>{{ answer.create_date }}</div>
+                        </div>
+                    </div>
+                    {% if request.user == answer.author %}
+                    <div class="my-3">
+                        <a href="{% url 'pybo:answer_modify' answer.id  %}"
+                           class="btn btn-sm btn-outline-secondary">수정</a>
+                        <a href="#" class="delete btn btn-sm btn-outline-secondary "
+                           data-uri="{% url 'pybo:answer_delete' answer.id  %}">삭제</a>
+                    </div>
+                    {% endif %}
+                    {% if answer.comment_set.count > 0 %}
+                    <div class="mt-3">
+                    {% for comment in answer.comment_set.all %}
+                        <a name="comment_{{ comment.id }}"></a>
+                        <div class="comment py-2 text-muted">
+                            <span style="white-space: pre-line;">{{ comment.content }}</span>
+                            <span>
+                                - {{ comment.author }}, {{ comment.create_date }}
+                                {% if comment.modify_date %}
+                                (수정:{{ comment.modify_date }})
+                                {% endif %}
+                            </span>
+                            {% if request.user == comment.author %}
+                            <a href="{% url 'pybo:comment_modify_answer' comment.id  %}" class="small">수정</a>,
+                            <a href="#" class="small delete"
+                               data-uri="{% url 'pybo:comment_delete_answer' comment.id  %}">삭제</a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div>
+                        <a href="{% url 'pybo:comment_create_answer' answer.id  %}"
+                           class="small"><small>댓글 추가 ..</small></a>
+                    </div>
+                </div>
+            </div>
+        </div> -->
     </div>
     {% endfor %}
     <form action="{% url 'pybo:answer_create' question.id %}" method="post" class="my-3">
@@ -168,6 +239,10 @@ $(document).ready(function(){
         if(confirm("정말로 추천하시겠습니까?")) {
             location.href = $(this).data('uri');
         }
+    });
+    $(".so_answer").on('change', function() {
+        $("#so_answer").val($(this).val());
+        $("#searchForm_answer").submit();
     });
 });
 </script>
